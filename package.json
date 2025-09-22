@@ -1,0 +1,22 @@
+{
+  "name": "vecnopool-payment",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/async-retry": "^1.4.9",
+    "@types/bun": "latest",
+    "@types/node-cron": "^3.0.11",
+    "@types/pg": "^8.15.5",
+    "@types/websocket": "^1.0.10"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "node-cron": "^3.0.3",
+    "p-queue": "^8.0.1",
+    "pg": "^8.12.0",
+    "websocket": "^1.0.35"
+  }
+}

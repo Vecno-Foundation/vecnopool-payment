@@ -1,0 +1,5 @@
+{
+    "node" : ["https://seed.vecnoscan.org"],
+    "network" : "mainnet",
+    "paymentInterval": 1
+}
