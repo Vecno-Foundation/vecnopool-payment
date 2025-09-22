@@ -134,7 +134,7 @@ cron.schedule(`0 */${paymentInterval} * * * *`, async () => {
   }
 });
 
-// Progress indicator logging every 10 minutes
+// Progress indicator logging every minute
 setInterval(() => {
   const now = new Date();
   const minutes = now.getMinutes();
@@ -143,7 +143,7 @@ setInterval(() => {
   const nextTransferMinutes = paymentInterval - (totalMinutes % paymentInterval);
   
   if (DEBUG) monitoring.debug(`Main: Progress update - ${nextTransferMinutes} minutes until the next balance transfer`);
-}, 10 * 60 * 1000); // 10 minutes in milliseconds
+}, 1 * 60 * 1000); // 1 minute in milliseconds
 
 monitoring.log(`Main: Scheduled balance transfer every ${paymentInterval} minutes`);
 if (DEBUG) monitoring.debug(`Main: Application fully initialized and running`);
