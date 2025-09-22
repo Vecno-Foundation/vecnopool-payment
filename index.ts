@@ -47,12 +47,12 @@ if (!databaseUrl) {
 if (DEBUG) monitoring.debug(`Main: Database URL obtained successfully`);
 
 if (DEBUG) monitoring.debug(`Main: Loading configuration parameters`);
-const paymentInterval = config.paymentInterval || 2;
-if (paymentInterval < 1 || paymentInterval > 24) {
-  monitoring.error('Main: paymentInterval must be between 1 and 24 hours.');
-  throw new Error('paymentInterval must be between 1 and 24 hours.');
+const paymentInterval = config.paymentInterval || 30; // Default to 30 minutes.
+if (paymentInterval < 5 || paymentInterval > 1440) { // 1440 minutes = 24 hours
+  monitoring.error('Main: paymentInterval must be between 5 and 1440 minutes.');
+  throw new Error('paymentInterval must be between 5 and 1440 minutes.');
 }
-if (DEBUG) monitoring.debug(`Main: Payment interval configured to ${paymentInterval} hours`);
+if (DEBUG) monitoring.debug(`Main: Payment interval configured to ${paymentInterval} minutes`);
 
 if (DEBUG) monitoring.debug(`Main: Initializing RPC client`);
 const rpc = new RpcClient({
@@ -111,16 +111,14 @@ if (!rpcConnected) {
   }
 }
 
-cron.schedule(`*/10 * * * *`, async () => {
+// Schedule balance transfer based on paymentInterval in minutes
+cron.schedule(`0 */${paymentInterval} * * * *`, async () => {
   const now = new Date();
   const minutes = now.getMinutes();
   const hours = now.getHours();
   if (DEBUG) monitoring.debug(`Main: Cron tick - Current time: ${now.toISOString()}, hours: ${hours}, minutes: ${minutes}`);
 
-  const isPaymentTime = minutes === 0 && (hours % paymentInterval === 0);
-  if (DEBUG) monitoring.debug(`Main: Checking if payment time - isPaymentTime: ${isPaymentTime}`);
-
-  if (isPaymentTime && rpcConnected) {
+  if (rpcConnected) {
     monitoring.log('Main: Running scheduled balance transfer');
     if (DEBUG) monitoring.debug(`Main: Starting balance transfer process`);
     try {
@@ -130,7 +128,7 @@ cron.schedule(`*/10 * * * *`, async () => {
       monitoring.error(`Main: Transaction manager error: ${transactionError}`);
       if (DEBUG) monitoring.debug(`Main: Detailed transaction error: ${transactionError}`);
     }
-  } else if (isPaymentTime && !rpcConnected) {
+  } else {
     monitoring.error('Main: RPC connection is not established before balance transfer');
     if (DEBUG) monitoring.debug(`Main: Skipped balance transfer due to missing RPC connection`);
   }
@@ -141,13 +139,11 @@ setInterval(() => {
   const now = new Date();
   const minutes = now.getMinutes();
   const hours = now.getHours();
-
-  const nextTransferHours = paymentInterval - (hours % paymentInterval);
-  const remainingMinutes = nextTransferHours * 60 - minutes;
-  const remainingTime = remainingMinutes === nextTransferHours * 60 ? 0 : remainingMinutes;
-
-  if (DEBUG) monitoring.debug(`Main: Progress update - ${remainingTime} minutes until the next balance transfer`);
+  const totalMinutes = hours * 60 + minutes;
+  const nextTransferMinutes = paymentInterval - (totalMinutes % paymentInterval);
+  
+  if (DEBUG) monitoring.debug(`Main: Progress update - ${nextTransferMinutes} minutes until the next balance transfer`);
 }, 10 * 60 * 1000); // 10 minutes in milliseconds
 
-monitoring.log(`Main: Scheduled balance transfer every ${paymentInterval} hours`);
+monitoring.log(`Main: Scheduled balance transfer every ${paymentInterval} minutes`);
 if (DEBUG) monitoring.debug(`Main: Application fully initialized and running`);
