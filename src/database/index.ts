@@ -25,13 +25,13 @@ export default class Database {
   }
 
   async getAllBalancesExcludingPool() {
-    // Query the pool's balances table instead of miners_balance
+    const minBalance = 10n * 10n ** 8n;
+    // Query the pool's balances table, excluding pool and balances < 10 VE
     const res = await this.client.query(
-      'SELECT address, available_balance FROM balances WHERE address != $1',
-      ['pool']
+      'SELECT address, available_balance FROM balances WHERE address != $1 AND available_balance >= $2',
+      ['pool', minBalance.toString()]
     );
     return res.rows.map((row: PoolBalanceRow) => ({
-      minerId: row.address, // Map address to minerId
       address: row.address,
       balance: BigInt(row.available_balance)
     }));

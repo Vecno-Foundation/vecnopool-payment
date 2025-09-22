@@ -72,8 +72,8 @@ export default class trxManager {
 
   async send(outputs: IPaymentOutput[]) {
     if (DEBUG) this.monitoring.debug(`TrxManager: Initiating send for ${outputs.length} payment outputs`);
-    console.log(outputs); // Consider replacing with monitoring.debug for consistency
-    if (DEBUG) this.monitoring.debug(`TrxManager: Using UtxoContext: ${this.context.id}`); // Assuming UtxoContext has an id or similar identifier
+    console.log(outputs);
+    if (DEBUG) this.monitoring.debug(`TrxManager: Using UtxoContext: ${this.context.id}`);
     try {
       const { transactions, summary } = await createTransactions({
         entries: this.context,

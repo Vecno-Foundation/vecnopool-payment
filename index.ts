@@ -1,7 +1,7 @@
 /**
  * This script initializes the Vecnopool Payment App, sets up the necessary environment variables,
  * and schedules a balance transfer task based on configuration. It also provides progress logging 
- * every 10 minutes.
+ * every minute.
  */
 
 import { RpcClient, Encoding, Resolver } from "./wasm/vecno";
