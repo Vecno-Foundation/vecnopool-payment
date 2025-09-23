@@ -7,6 +7,20 @@ This app is used together with [Vecnopool](https://github.com/Vecno-Foundation/v
 - Checkout repository and `cd` to the folder
 - Run `bun install`
 
+## Docker
+
+Build docker image, by running
+
+```
+docker build -t vecnopool-payment .
+```
+
+Run the docker by
+
+```
+docker run vecnopool-payment
+```
+
 ## Usage
 
 1. Create a pool wallet using the latest [WASM](https://github.com/Vecno-Foundation/vecnod/releases "WASM") release. Follow the instructions.
