@@ -475,6 +475,385 @@ module.exports.calculateTarget = function(difficulty) {
 };
 
 /**
+ * `calculateTransactionFee()` returns minimum fees needed for the transaction to be
+ * accepted by the network. If the transaction is invalid or the mass can not be calculated,
+ * the function throws an error. If the mass exceeds the maximum standard transaction mass,
+ * the function returns `undefined`.
+ *
+ * @category Wallet SDK
+ * @see {@link maximumStandardTransactionMass}
+ * @see {@link calculateTransactionMass}
+ * @see {@link updateTransactionMass}
+ * @param {NetworkId | string} network_id
+ * @param {ITransaction | Transaction} tx
+ * @param {number | null} [minimum_signatures]
+ * @returns {bigint | undefined}
+ */
+module.exports.calculateTransactionFee = function(network_id, tx, minimum_signatures) {
+    try {
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-32);
+        wasm.calculateTransactionFee(retptr, addHeapObject(network_id), addBorrowedObject(tx), isLikeNone(minimum_signatures) ? 0xFFFFFF : minimum_signatures);
+        var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
+        var r2 = getDataViewMemory0().getBigInt64(retptr + 8 * 1, true);
+        var r4 = getDataViewMemory0().getInt32(retptr + 4 * 4, true);
+        var r5 = getDataViewMemory0().getInt32(retptr + 4 * 5, true);
+        if (r5) {
+            throw takeObject(r4);
+        }
+        return r0 === 0 ? undefined : BigInt.asUintN(64, r2);
+    } finally {
+        wasm.__wbindgen_add_to_stack_pointer(32);
+        heap[stack_pointer++] = undefined;
+    }
+};
+
+/**
+ * `updateTransactionMass()` updates the mass property of the passed transaction.
+ * If the transaction is invalid, the function throws an error.
+ *
+ * The function returns `true` if the mass is within the maximum standard transaction mass and
+ * the transaction mass is updated. Otherwise, the function returns `false`.
+ *
+ * This is similar to `calculateTransactionMass()` but modifies the supplied
+ * `Transaction` object.
+ *
+ * @category Wallet SDK
+ * @see {@link maximumStandardTransactionMass}
+ * @see {@link calculateTransactionMass}
+ * @see {@link calculateTransactionFee}
+ * @param {NetworkId | string} network_id
+ * @param {Transaction} tx
+ * @param {number | null} [minimum_signatures]
+ * @returns {boolean}
+ */
+module.exports.updateTransactionMass = function(network_id, tx, minimum_signatures) {
+    try {
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+        _assertClass(tx, Transaction);
+        wasm.updateTransactionMass(retptr, addHeapObject(network_id), tx.__wbg_ptr, isLikeNone(minimum_signatures) ? 0xFFFFFF : minimum_signatures);
+        var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
+        var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
+        var r2 = getDataViewMemory0().getInt32(retptr + 4 * 2, true);
+        if (r2) {
+            throw takeObject(r1);
+        }
+        return r0 !== 0;
+    } finally {
+        wasm.__wbindgen_add_to_stack_pointer(16);
+    }
+};
+
+/**
+ * `calculateTransactionMass()` returns the mass of the passed transaction.
+ * If the transaction is invalid, or the mass can not be calculated
+ * the function throws an error.
+ *
+ * The mass value must not exceed the maximum standard transaction mass
+ * that can be obtained using `maximumStandardTransactionMass()`.
+ *
+ * @category Wallet SDK
+ * @see {@link maximumStandardTransactionMass}
+ * @param {NetworkId | string} network_id
+ * @param {ITransaction | Transaction} tx
+ * @param {number | null} [minimum_signatures]
+ * @returns {bigint}
+ */
+module.exports.calculateTransactionMass = function(network_id, tx, minimum_signatures) {
+    try {
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+        wasm.calculateTransactionMass(retptr, addHeapObject(network_id), addBorrowedObject(tx), isLikeNone(minimum_signatures) ? 0xFFFFFF : minimum_signatures);
+        var r0 = getDataViewMemory0().getBigInt64(retptr + 8 * 0, true);
+        var r2 = getDataViewMemory0().getInt32(retptr + 4 * 2, true);
+        var r3 = getDataViewMemory0().getInt32(retptr + 4 * 3, true);
+        if (r3) {
+            throw takeObject(r2);
+        }
+        return BigInt.asUintN(64, r0);
+    } finally {
+        wasm.__wbindgen_add_to_stack_pointer(16);
+        heap[stack_pointer++] = undefined;
+    }
+};
+
+/**
+ * `maximumStandardTransactionMass()` returns the maximum transaction
+ * size allowed by the network.
+ *
+ * @category Wallet SDK
+ * @see {@link calculateTransactionMass}
+ * @see {@link updateTransactionMass}
+ * @see {@link calculateTransactionFee}
+ * @returns {bigint}
+ */
+module.exports.maximumStandardTransactionMass = function() {
+    const ret = wasm.maximumStandardTransactionMass();
+    return BigInt.asUintN(64, ret);
+};
+
+/**
+ * @category Wallet SDK
+ * @param {any} script_hash
+ * @param {PrivateKey} privkey
+ * @returns {string}
+ */
+module.exports.signScriptHash = function(script_hash, privkey) {
+    let deferred2_0;
+    let deferred2_1;
+    try {
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+        _assertClass(privkey, PrivateKey);
+        wasm.signScriptHash(retptr, addHeapObject(script_hash), privkey.__wbg_ptr);
+        var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
+        var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
+        var r2 = getDataViewMemory0().getInt32(retptr + 4 * 2, true);
+        var r3 = getDataViewMemory0().getInt32(retptr + 4 * 3, true);
+        var ptr1 = r0;
+        var len1 = r1;
+        if (r3) {
+            ptr1 = 0; len1 = 0;
+            throw takeObject(r2);
+        }
+        deferred2_0 = ptr1;
+        deferred2_1 = len1;
+        return getStringFromWasm0(ptr1, len1);
+    } finally {
+        wasm.__wbindgen_add_to_stack_pointer(16);
+        wasm.__wbindgen_export_3(deferred2_0, deferred2_1, 1);
+    }
+};
+
+/**
+ * `createInputSignature()` is a helper function to sign a transaction input with a specific SigHash type using a private key.
+ * @category Wallet SDK
+ * @param {Transaction} tx
+ * @param {number} input_index
+ * @param {PrivateKey} private_key
+ * @param {SighashType | null} [sighash_type]
+ * @returns {HexString}
+ */
+module.exports.createInputSignature = function(tx, input_index, private_key, sighash_type) {
+    try {
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+        _assertClass(tx, Transaction);
+        _assertClass(private_key, PrivateKey);
+        wasm.createInputSignature(retptr, tx.__wbg_ptr, input_index, private_key.__wbg_ptr, isLikeNone(sighash_type) ? 6 : sighash_type);
+        var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
+        var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
+        var r2 = getDataViewMemory0().getInt32(retptr + 4 * 2, true);
+        if (r2) {
+            throw takeObject(r1);
+        }
+        return takeObject(r0);
+    } finally {
+        wasm.__wbindgen_add_to_stack_pointer(16);
+    }
+};
+
+/**
+ * `signTransaction()` is a helper function to sign a transaction using a private key array or a signer array.
+ * @category Wallet SDK
+ * @param {Transaction} tx
+ * @param {(PrivateKey | HexString | Uint8Array)[]} signer
+ * @param {boolean} verify_sig
+ * @returns {Transaction}
+ */
+module.exports.signTransaction = function(tx, signer, verify_sig) {
+    try {
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+        _assertClass(tx, Transaction);
+        wasm.signTransaction(retptr, tx.__wbg_ptr, addBorrowedObject(signer), verify_sig);
+        var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
+        var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
+        var r2 = getDataViewMemory0().getInt32(retptr + 4 * 2, true);
+        if (r2) {
+            throw takeObject(r1);
+        }
+        return Transaction.__wrap(r0);
+    } finally {
+        wasm.__wbindgen_add_to_stack_pointer(16);
+        heap[stack_pointer++] = undefined;
+    }
+};
+
+/**
+ *
+ * Format a Sompi amount to a string representation of the amount in Vecno with a suffix
+ * based on the network type (e.g. `VE` for mainnet, `TVE` for testnet,
+ * `SVE` for simnet, `DVE` for devnet).
+ *
+ * @category Wallet SDK
+ * @param {bigint | number | HexString} sompi
+ * @param {NetworkType | NetworkId | string} network
+ * @returns {string}
+ */
+module.exports.sompiToVecnoStringWithSuffix = function(sompi, network) {
+    let deferred2_0;
+    let deferred2_1;
+    try {
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+        wasm.sompiToVecnoStringWithSuffix(retptr, addHeapObject(sompi), addBorrowedObject(network));
+        var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
+        var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
+        var r2 = getDataViewMemory0().getInt32(retptr + 4 * 2, true);
+        var r3 = getDataViewMemory0().getInt32(retptr + 4 * 3, true);
+        var ptr1 = r0;
+        var len1 = r1;
+        if (r3) {
+            ptr1 = 0; len1 = 0;
+            throw takeObject(r2);
+        }
+        deferred2_0 = ptr1;
+        deferred2_1 = len1;
+        return getStringFromWasm0(ptr1, len1);
+    } finally {
+        wasm.__wbindgen_add_to_stack_pointer(16);
+        heap[stack_pointer++] = undefined;
+        wasm.__wbindgen_export_3(deferred2_0, deferred2_1, 1);
+    }
+};
+
+/**
+ *
+ * Convert Sompi to a string representation of the amount in Vecno.
+ *
+ * @category Wallet SDK
+ * @param {bigint | number | HexString} sompi
+ * @returns {string}
+ */
+module.exports.sompiToVecnoString = function(sompi) {
+    let deferred2_0;
+    let deferred2_1;
+    try {
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+        wasm.sompiToVecnoString(retptr, addHeapObject(sompi));
+        var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
+        var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
+        var r2 = getDataViewMemory0().getInt32(retptr + 4 * 2, true);
+        var r3 = getDataViewMemory0().getInt32(retptr + 4 * 3, true);
+        var ptr1 = r0;
+        var len1 = r1;
+        if (r3) {
+            ptr1 = 0; len1 = 0;
+            throw takeObject(r2);
+        }
+        deferred2_0 = ptr1;
+        deferred2_1 = len1;
+        return getStringFromWasm0(ptr1, len1);
+    } finally {
+        wasm.__wbindgen_add_to_stack_pointer(16);
+        wasm.__wbindgen_export_3(deferred2_0, deferred2_1, 1);
+    }
+};
+
+/**
+ * Convert a Vecno string to Sompi represented by bigint.
+ * This function provides correct precision handling and
+ * can be used to parse user input.
+ * @category Wallet SDK
+ * @param {string} vecno
+ * @returns {bigint | undefined}
+ */
+module.exports.vecnoToSompi = function(vecno) {
+    const ptr0 = passStringToWasm0(vecno, wasm.__wbindgen_export_1, wasm.__wbindgen_export_2);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.vecnoToSompi(ptr0, len0);
+    return takeObject(ret);
+};
+
+/**
+ * Verifies with a public key the signature of the given message
+ * @category Message Signing
+ */
+module.exports.verifyMessage = function(value) {
+    try {
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+        wasm.verifyMessage(retptr, addHeapObject(value));
+        var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
+        var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
+        var r2 = getDataViewMemory0().getInt32(retptr + 4 * 2, true);
+        if (r2) {
+            throw takeObject(r1);
+        }
+        return r0 !== 0;
+    } finally {
+        wasm.__wbindgen_add_to_stack_pointer(16);
+    }
+};
+
+/**
+ * Signs a message with the given private key
+ * @category Message Signing
+ * @param {ISignMessage} value
+ * @returns {HexString}
+ */
+module.exports.signMessage = function(value) {
+    try {
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+        wasm.signMessage(retptr, addHeapObject(value));
+        var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
+        var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
+        var r2 = getDataViewMemory0().getInt32(retptr + 4 * 2, true);
+        if (r2) {
+            throw takeObject(r1);
+        }
+        return takeObject(r0);
+    } finally {
+        wasm.__wbindgen_add_to_stack_pointer(16);
+    }
+};
+
+/**
+ * Helper function that creates an estimate using the transaction {@link Generator}
+ * by producing only the {@link GeneratorSummary} containing the estimate.
+ * @see {@link IGeneratorSettingsObject}, {@link Generator}, {@link createTransactions}
+ * @category Wallet SDK
+ * @param {IGeneratorSettingsObject} settings
+ * @returns {Promise<GeneratorSummary>}
+ */
+module.exports.estimateTransactions = function(settings) {
+    const ret = wasm.estimateTransactions(addHeapObject(settings));
+    return takeObject(ret);
+};
+
+/**
+ * Helper function that creates a set of transactions using the transaction {@link Generator}.
+ * @see {@link IGeneratorSettingsObject}, {@link Generator}, {@link estimateTransactions}
+ * @category Wallet SDK
+ * @param {IGeneratorSettingsObject} settings
+ * @returns {Promise<ICreateTransactions>}
+ */
+module.exports.createTransactions = function(settings) {
+    const ret = wasm.createTransactions(addHeapObject(settings));
+    return takeObject(ret);
+};
+
+/**
+ * Create a basic transaction without any mass limit checks.
+ * @category Wallet SDK
+ * @param {IUtxoEntry[]} utxo_entry_source
+ * @param {IPaymentOutput[]} outputs
+ * @param {bigint} priority_fee
+ * @param {HexString | Uint8Array | null} [payload]
+ * @param {number | null} [sig_op_count]
+ * @returns {Transaction}
+ */
+module.exports.createTransaction = function(utxo_entry_source, outputs, priority_fee, payload, sig_op_count) {
+    try {
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+        wasm.createTransaction(retptr, addHeapObject(utxo_entry_source), addHeapObject(outputs), addHeapObject(priority_fee), isLikeNone(payload) ? 0 : addHeapObject(payload), isLikeNone(sig_op_count) ? 0xFFFFFF : sig_op_count);
+        var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
+        var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
+        var r2 = getDataViewMemory0().getInt32(retptr + 4 * 2, true);
+        if (r2) {
+            throw takeObject(r1);
+        }
+        return Transaction.__wrap(r0);
+    } finally {
+        wasm.__wbindgen_add_to_stack_pointer(16);
+    }
+};
+
+/**
  * WASM32 binding for `argon2sha256iv` hash function.
  * @param text - The text string to hash.
  * @category Encryption
@@ -694,296 +1073,64 @@ module.exports.encryptXChaCha20Poly1305 = function(plainText, password) {
 };
 
 /**
- * Verifies with a public key the signature of the given message
- * @category Message Signing
- */
-module.exports.verifyMessage = function(value) {
-    try {
-        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-        wasm.verifyMessage(retptr, addHeapObject(value));
-        var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
-        var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
-        var r2 = getDataViewMemory0().getInt32(retptr + 4 * 2, true);
-        if (r2) {
-            throw takeObject(r1);
-        }
-        return r0 !== 0;
-    } finally {
-        wasm.__wbindgen_add_to_stack_pointer(16);
-    }
-};
-
-/**
- * Signs a message with the given private key
- * @category Message Signing
- * @param {ISignMessage} value
- * @returns {HexString}
- */
-module.exports.signMessage = function(value) {
-    try {
-        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-        wasm.signMessage(retptr, addHeapObject(value));
-        var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
-        var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
-        var r2 = getDataViewMemory0().getInt32(retptr + 4 * 2, true);
-        if (r2) {
-            throw takeObject(r1);
-        }
-        return takeObject(r0);
-    } finally {
-        wasm.__wbindgen_add_to_stack_pointer(16);
-    }
-};
-
-/**
- * `calculateTransactionFee()` returns minimum fees needed for the transaction to be
- * accepted by the network. If the transaction is invalid or the mass can not be calculated,
- * the function throws an error. If the mass exceeds the maximum standard transaction mass,
- * the function returns `undefined`.
- *
  * @category Wallet SDK
- * @see {@link maximumStandardTransactionMass}
- * @see {@link calculateTransactionMass}
- * @see {@link updateTransactionMass}
- * @param {NetworkId | string} network_id
- * @param {ITransaction | Transaction} tx
- * @param {number | null} [minimum_signatures]
- * @returns {bigint | undefined}
+ * @param {PublicKey | string} key
+ * @param {NetworkType | NetworkId | string} network
+ * @param {boolean | null} [ecdsa]
+ * @param {AccountKind | null} [account_kind]
+ * @returns {Address}
  */
-module.exports.calculateTransactionFee = function(network_id, tx, minimum_signatures) {
+module.exports.createAddress = function(key, network, ecdsa, account_kind) {
     try {
-        const retptr = wasm.__wbindgen_add_to_stack_pointer(-32);
-        wasm.calculateTransactionFee(retptr, addHeapObject(network_id), addBorrowedObject(tx), isLikeNone(minimum_signatures) ? 0xFFFFFF : minimum_signatures);
-        var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
-        var r2 = getDataViewMemory0().getBigInt64(retptr + 8 * 1, true);
-        var r4 = getDataViewMemory0().getInt32(retptr + 4 * 4, true);
-        var r5 = getDataViewMemory0().getInt32(retptr + 4 * 5, true);
-        if (r5) {
-            throw takeObject(r4);
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+        let ptr0 = 0;
+        if (!isLikeNone(account_kind)) {
+            _assertClass(account_kind, AccountKind);
+            ptr0 = account_kind.__destroy_into_raw();
         }
-        return r0 === 0 ? undefined : BigInt.asUintN(64, r2);
+        wasm.createAddress(retptr, addBorrowedObject(key), addBorrowedObject(network), isLikeNone(ecdsa) ? 0xFFFFFF : ecdsa ? 1 : 0, ptr0);
+        var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
+        var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
+        var r2 = getDataViewMemory0().getInt32(retptr + 4 * 2, true);
+        if (r2) {
+            throw takeObject(r1);
+        }
+        return Address.__wrap(r0);
     } finally {
-        wasm.__wbindgen_add_to_stack_pointer(32);
+        wasm.__wbindgen_add_to_stack_pointer(16);
+        heap[stack_pointer++] = undefined;
         heap[stack_pointer++] = undefined;
     }
 };
 
 /**
- * `updateTransactionMass()` updates the mass property of the passed transaction.
- * If the transaction is invalid, the function throws an error.
- *
- * The function returns `true` if the mass is within the maximum standard transaction mass and
- * the transaction mass is updated. Otherwise, the function returns `false`.
- *
- * This is similar to `calculateTransactionMass()` but modifies the supplied
- * `Transaction` object.
- *
  * @category Wallet SDK
- * @see {@link maximumStandardTransactionMass}
- * @see {@link calculateTransactionMass}
- * @see {@link calculateTransactionFee}
- * @param {NetworkId | string} network_id
- * @param {Transaction} tx
- * @param {number | null} [minimum_signatures]
- * @returns {boolean}
+ * @param {number} minimum_signatures
+ * @param {(PublicKey | string)[]} keys
+ * @param {NetworkType} network_type
+ * @param {boolean | null} [ecdsa]
+ * @param {AccountKind | null} [account_kind]
+ * @returns {Address}
  */
-module.exports.updateTransactionMass = function(network_id, tx, minimum_signatures) {
+module.exports.createMultisigAddress = function(minimum_signatures, keys, network_type, ecdsa, account_kind) {
     try {
         const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-        _assertClass(tx, Transaction);
-        wasm.updateTransactionMass(retptr, addHeapObject(network_id), tx.__wbg_ptr, isLikeNone(minimum_signatures) ? 0xFFFFFF : minimum_signatures);
+        let ptr0 = 0;
+        if (!isLikeNone(account_kind)) {
+            _assertClass(account_kind, AccountKind);
+            ptr0 = account_kind.__destroy_into_raw();
+        }
+        wasm.createMultisigAddress(retptr, minimum_signatures, addBorrowedObject(keys), network_type, isLikeNone(ecdsa) ? 0xFFFFFF : ecdsa ? 1 : 0, ptr0);
         var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
         var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
         var r2 = getDataViewMemory0().getInt32(retptr + 4 * 2, true);
         if (r2) {
             throw takeObject(r1);
         }
-        return r0 !== 0;
-    } finally {
-        wasm.__wbindgen_add_to_stack_pointer(16);
-    }
-};
-
-/**
- * `calculateTransactionMass()` returns the mass of the passed transaction.
- * If the transaction is invalid, or the mass can not be calculated
- * the function throws an error.
- *
- * The mass value must not exceed the maximum standard transaction mass
- * that can be obtained using `maximumStandardTransactionMass()`.
- *
- * @category Wallet SDK
- * @see {@link maximumStandardTransactionMass}
- * @param {NetworkId | string} network_id
- * @param {ITransaction | Transaction} tx
- * @param {number | null} [minimum_signatures]
- * @returns {bigint}
- */
-module.exports.calculateTransactionMass = function(network_id, tx, minimum_signatures) {
-    try {
-        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-        wasm.calculateTransactionMass(retptr, addHeapObject(network_id), addBorrowedObject(tx), isLikeNone(minimum_signatures) ? 0xFFFFFF : minimum_signatures);
-        var r0 = getDataViewMemory0().getBigInt64(retptr + 8 * 0, true);
-        var r2 = getDataViewMemory0().getInt32(retptr + 4 * 2, true);
-        var r3 = getDataViewMemory0().getInt32(retptr + 4 * 3, true);
-        if (r3) {
-            throw takeObject(r2);
-        }
-        return BigInt.asUintN(64, r0);
+        return Address.__wrap(r0);
     } finally {
         wasm.__wbindgen_add_to_stack_pointer(16);
         heap[stack_pointer++] = undefined;
-    }
-};
-
-/**
- * `maximumStandardTransactionMass()` returns the maximum transaction
- * size allowed by the network.
- *
- * @category Wallet SDK
- * @see {@link calculateTransactionMass}
- * @see {@link updateTransactionMass}
- * @see {@link calculateTransactionFee}
- * @returns {bigint}
- */
-module.exports.maximumStandardTransactionMass = function() {
-    const ret = wasm.maximumStandardTransactionMass();
-    return BigInt.asUintN(64, ret);
-};
-
-/**
- * @category Wallet SDK
- * @param {any} script_hash
- * @param {PrivateKey} privkey
- * @returns {string}
- */
-module.exports.signScriptHash = function(script_hash, privkey) {
-    let deferred2_0;
-    let deferred2_1;
-    try {
-        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-        _assertClass(privkey, PrivateKey);
-        wasm.signScriptHash(retptr, addHeapObject(script_hash), privkey.__wbg_ptr);
-        var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
-        var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
-        var r2 = getDataViewMemory0().getInt32(retptr + 4 * 2, true);
-        var r3 = getDataViewMemory0().getInt32(retptr + 4 * 3, true);
-        var ptr1 = r0;
-        var len1 = r1;
-        if (r3) {
-            ptr1 = 0; len1 = 0;
-            throw takeObject(r2);
-        }
-        deferred2_0 = ptr1;
-        deferred2_1 = len1;
-        return getStringFromWasm0(ptr1, len1);
-    } finally {
-        wasm.__wbindgen_add_to_stack_pointer(16);
-        wasm.__wbindgen_export_3(deferred2_0, deferred2_1, 1);
-    }
-};
-
-/**
- * `createInputSignature()` is a helper function to sign a transaction input with a specific SigHash type using a private key.
- * @category Wallet SDK
- * @param {Transaction} tx
- * @param {number} input_index
- * @param {PrivateKey} private_key
- * @param {SighashType | null} [sighash_type]
- * @returns {HexString}
- */
-module.exports.createInputSignature = function(tx, input_index, private_key, sighash_type) {
-    try {
-        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-        _assertClass(tx, Transaction);
-        _assertClass(private_key, PrivateKey);
-        wasm.createInputSignature(retptr, tx.__wbg_ptr, input_index, private_key.__wbg_ptr, isLikeNone(sighash_type) ? 6 : sighash_type);
-        var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
-        var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
-        var r2 = getDataViewMemory0().getInt32(retptr + 4 * 2, true);
-        if (r2) {
-            throw takeObject(r1);
-        }
-        return takeObject(r0);
-    } finally {
-        wasm.__wbindgen_add_to_stack_pointer(16);
-    }
-};
-
-/**
- * `signTransaction()` is a helper function to sign a transaction using a private key array or a signer array.
- * @category Wallet SDK
- * @param {Transaction} tx
- * @param {(PrivateKey | HexString | Uint8Array)[]} signer
- * @param {boolean} verify_sig
- * @returns {Transaction}
- */
-module.exports.signTransaction = function(tx, signer, verify_sig) {
-    try {
-        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-        _assertClass(tx, Transaction);
-        wasm.signTransaction(retptr, tx.__wbg_ptr, addBorrowedObject(signer), verify_sig);
-        var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
-        var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
-        var r2 = getDataViewMemory0().getInt32(retptr + 4 * 2, true);
-        if (r2) {
-            throw takeObject(r1);
-        }
-        return Transaction.__wrap(r0);
-    } finally {
-        wasm.__wbindgen_add_to_stack_pointer(16);
-        heap[stack_pointer++] = undefined;
-    }
-};
-
-/**
- * Helper function that creates an estimate using the transaction {@link Generator}
- * by producing only the {@link GeneratorSummary} containing the estimate.
- * @see {@link IGeneratorSettingsObject}, {@link Generator}, {@link createTransactions}
- * @category Wallet SDK
- * @param {IGeneratorSettingsObject} settings
- * @returns {Promise<GeneratorSummary>}
- */
-module.exports.estimateTransactions = function(settings) {
-    const ret = wasm.estimateTransactions(addHeapObject(settings));
-    return takeObject(ret);
-};
-
-/**
- * Helper function that creates a set of transactions using the transaction {@link Generator}.
- * @see {@link IGeneratorSettingsObject}, {@link Generator}, {@link estimateTransactions}
- * @category Wallet SDK
- * @param {IGeneratorSettingsObject} settings
- * @returns {Promise<ICreateTransactions>}
- */
-module.exports.createTransactions = function(settings) {
-    const ret = wasm.createTransactions(addHeapObject(settings));
-    return takeObject(ret);
-};
-
-/**
- * Create a basic transaction without any mass limit checks.
- * @category Wallet SDK
- * @param {IUtxoEntry[]} utxo_entry_source
- * @param {IPaymentOutput[]} outputs
- * @param {bigint} priority_fee
- * @param {HexString | Uint8Array | null} [payload]
- * @param {number | null} [sig_op_count]
- * @returns {Transaction}
- */
-module.exports.createTransaction = function(utxo_entry_source, outputs, priority_fee, payload, sig_op_count) {
-    try {
-        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-        wasm.createTransaction(retptr, addHeapObject(utxo_entry_source), addHeapObject(outputs), addHeapObject(priority_fee), isLikeNone(payload) ? 0 : addHeapObject(payload), isLikeNone(sig_op_count) ? 0xFFFFFF : sig_op_count);
-        var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
-        var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
-        var r2 = getDataViewMemory0().getInt32(retptr + 4 * 2, true);
-        if (r2) {
-            throw takeObject(r1);
-        }
-        return Transaction.__wrap(r0);
-    } finally {
-        wasm.__wbindgen_add_to_stack_pointer(16);
     }
 };
 
@@ -1049,153 +1196,6 @@ module.exports.setDefaultWalletFile = function(folder) {
         }
     } finally {
         wasm.__wbindgen_add_to_stack_pointer(16);
-    }
-};
-
-/**
- *
- * Format a Sompi amount to a string representation of the amount in Vecno with a suffix
- * based on the network type (e.g. `VE` for mainnet, `TVE` for testnet,
- * `SVE` for simnet, `DVE` for devnet).
- *
- * @category Wallet SDK
- * @param {bigint | number | HexString} sompi
- * @param {NetworkType | NetworkId | string} network
- * @returns {string}
- */
-module.exports.sompiToVecnoStringWithSuffix = function(sompi, network) {
-    let deferred2_0;
-    let deferred2_1;
-    try {
-        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-        wasm.sompiToVecnoStringWithSuffix(retptr, addHeapObject(sompi), addBorrowedObject(network));
-        var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
-        var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
-        var r2 = getDataViewMemory0().getInt32(retptr + 4 * 2, true);
-        var r3 = getDataViewMemory0().getInt32(retptr + 4 * 3, true);
-        var ptr1 = r0;
-        var len1 = r1;
-        if (r3) {
-            ptr1 = 0; len1 = 0;
-            throw takeObject(r2);
-        }
-        deferred2_0 = ptr1;
-        deferred2_1 = len1;
-        return getStringFromWasm0(ptr1, len1);
-    } finally {
-        wasm.__wbindgen_add_to_stack_pointer(16);
-        heap[stack_pointer++] = undefined;
-        wasm.__wbindgen_export_3(deferred2_0, deferred2_1, 1);
-    }
-};
-
-/**
- *
- * Convert Sompi to a string representation of the amount in Vecno.
- *
- * @category Wallet SDK
- * @param {bigint | number | HexString} sompi
- * @returns {string}
- */
-module.exports.sompiToVecnoString = function(sompi) {
-    let deferred2_0;
-    let deferred2_1;
-    try {
-        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-        wasm.sompiToVecnoString(retptr, addHeapObject(sompi));
-        var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
-        var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
-        var r2 = getDataViewMemory0().getInt32(retptr + 4 * 2, true);
-        var r3 = getDataViewMemory0().getInt32(retptr + 4 * 3, true);
-        var ptr1 = r0;
-        var len1 = r1;
-        if (r3) {
-            ptr1 = 0; len1 = 0;
-            throw takeObject(r2);
-        }
-        deferred2_0 = ptr1;
-        deferred2_1 = len1;
-        return getStringFromWasm0(ptr1, len1);
-    } finally {
-        wasm.__wbindgen_add_to_stack_pointer(16);
-        wasm.__wbindgen_export_3(deferred2_0, deferred2_1, 1);
-    }
-};
-
-/**
- * Convert a Vecno string to Sompi represented by bigint.
- * This function provides correct precision handling and
- * can be used to parse user input.
- * @category Wallet SDK
- * @param {string} vecno
- * @returns {bigint | undefined}
- */
-module.exports.vecnoToSompi = function(vecno) {
-    const ptr0 = passStringToWasm0(vecno, wasm.__wbindgen_export_1, wasm.__wbindgen_export_2);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.vecnoToSompi(ptr0, len0);
-    return takeObject(ret);
-};
-
-/**
- * @category Wallet SDK
- * @param {PublicKey | string} key
- * @param {NetworkType | NetworkId | string} network
- * @param {boolean | null} [ecdsa]
- * @param {AccountKind | null} [account_kind]
- * @returns {Address}
- */
-module.exports.createAddress = function(key, network, ecdsa, account_kind) {
-    try {
-        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-        let ptr0 = 0;
-        if (!isLikeNone(account_kind)) {
-            _assertClass(account_kind, AccountKind);
-            ptr0 = account_kind.__destroy_into_raw();
-        }
-        wasm.createAddress(retptr, addBorrowedObject(key), addBorrowedObject(network), isLikeNone(ecdsa) ? 0xFFFFFF : ecdsa ? 1 : 0, ptr0);
-        var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
-        var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
-        var r2 = getDataViewMemory0().getInt32(retptr + 4 * 2, true);
-        if (r2) {
-            throw takeObject(r1);
-        }
-        return Address.__wrap(r0);
-    } finally {
-        wasm.__wbindgen_add_to_stack_pointer(16);
-        heap[stack_pointer++] = undefined;
-        heap[stack_pointer++] = undefined;
-    }
-};
-
-/**
- * @category Wallet SDK
- * @param {number} minimum_signatures
- * @param {(PublicKey | string)[]} keys
- * @param {NetworkType} network_type
- * @param {boolean | null} [ecdsa]
- * @param {AccountKind | null} [account_kind]
- * @returns {Address}
- */
-module.exports.createMultisigAddress = function(minimum_signatures, keys, network_type, ecdsa, account_kind) {
-    try {
-        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-        let ptr0 = 0;
-        if (!isLikeNone(account_kind)) {
-            _assertClass(account_kind, AccountKind);
-            ptr0 = account_kind.__destroy_into_raw();
-        }
-        wasm.createMultisigAddress(retptr, minimum_signatures, addBorrowedObject(keys), network_type, isLikeNone(ecdsa) ? 0xFFFFFF : ecdsa ? 1 : 0, ptr0);
-        var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
-        var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
-        var r2 = getDataViewMemory0().getInt32(retptr + 4 * 2, true);
-        if (r2) {
-            throw takeObject(r1);
-        }
-        return Address.__wrap(r0);
-    } finally {
-        wasm.__wbindgen_add_to_stack_pointer(16);
-        heap[stack_pointer++] = undefined;
     }
 };
 
@@ -1308,12 +1308,12 @@ function __wbg_adapter_60(arg0, arg1) {
     wasm.__wbindgen_export_5(arg0, arg1);
 }
 
-function __wbg_adapter_63(arg0, arg1, arg2) {
-    wasm.__wbindgen_export_6(arg0, arg1, addHeapObject(arg2));
+function __wbg_adapter_63(arg0, arg1) {
+    wasm.__wbindgen_export_6(arg0, arg1);
 }
 
-function __wbg_adapter_66(arg0, arg1) {
-    wasm.__wbindgen_export_7(arg0, arg1);
+function __wbg_adapter_66(arg0, arg1, arg2) {
+    wasm.__wbindgen_export_7(arg0, arg1, addHeapObject(arg2));
 }
 
 function __wbg_adapter_69(arg0, arg1, arg2) {
@@ -1340,11 +1340,11 @@ function __wbg_adapter_75(arg0, arg1, arg2, arg3) {
 }
 
 function __wbg_adapter_78(arg0, arg1, arg2) {
-    wasm.__wbindgen_export_11(arg0, arg1, addHeapObject(arg2));
+    wasm.__wbindgen_export_11(arg0, arg1, arg2);
 }
 
 function __wbg_adapter_81(arg0, arg1, arg2) {
-    wasm.__wbindgen_export_11(arg0, arg1, arg2);
+    wasm.__wbindgen_export_11(arg0, arg1, addHeapObject(arg2));
 }
 
 function __wbg_adapter_84(arg0, arg1, arg2) {
@@ -6246,7 +6246,7 @@ const PrivateKeyGeneratorFinalization = (typeof FinalizationRegistry === 'undefi
  * private keys for the receive and change paths given the pre-set parameters
  * such as account index, multisig purpose and cosigner index.
  *
- * Please note that in Vecno master private keys use `kprv` prefix.
+ * Please note that in Vecno master private keys use `vprv` prefix.
  *
  * @see {@link PublicKeyGenerator}, {@link XPub}, {@link XPrv}, {@link Mnemonic}
  * @category Wallet SDK
@@ -6588,7 +6588,7 @@ const PublicKeyGeneratorFinalization = (typeof FinalizationRegistry === 'undefin
  * Helper class to generate public keys from an extended public key (XPub)
  * that has been derived up to the co-signer index.
  *
- * Please note that in Vecno master public keys use `kpub` prefix.
+ * Please note that in Vecno master public keys use `vpub` prefix.
  *
  * @see {@link PrivateKeyGenerator}, {@link XPub}, {@link XPrv}, {@link Mnemonic}
  * @category Wallet SDK
@@ -6615,14 +6615,14 @@ class PublicKeyGenerator {
         wasm.__wbg_publickeygenerator_free(ptr, 0);
     }
     /**
-     * @param {XPub | string} kpub
+     * @param {XPub | string} vpub
      * @param {number | null} [cosigner_index]
      * @returns {PublicKeyGenerator}
      */
-    static fromXPub(kpub, cosigner_index) {
+    static fromXPub(vpub, cosigner_index) {
         try {
             const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-            wasm.publickeygenerator_fromXPub(retptr, addBorrowedObject(kpub), isLikeNone(cosigner_index) ? 0x100000001 : (cosigner_index) >>> 0);
+            wasm.publickeygenerator_fromXPub(retptr, addBorrowedObject(vpub), isLikeNone(cosigner_index) ? 0x100000001 : (cosigner_index) >>> 0);
             var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
             var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
             var r2 = getDataViewMemory0().getInt32(retptr + 4 * 2, true);
@@ -12456,7 +12456,7 @@ const XPrvFinalization = (typeof FinalizationRegistry === 'undefined')
  * This class allows accepts a master seed and provides
  * functions for derivation of dependent child private keys.
  *
- * Please note that Vecno extended private keys use `kprv` prefix.
+ * Please note that Vecno extended private keys use `vprv` prefix.
  *
  * @see {@link PrivateKeyGenerator}, {@link PublicKeyGenerator}, {@link XPub}, {@link Mnemonic}
  * @category Wallet SDK
@@ -12787,7 +12787,7 @@ const XPubFinalization = (typeof FinalizationRegistry === 'undefined')
  * This class allows accepts another XPub and and provides
  * functions for derivation of dependent child public keys.
  *
- * Please note that Vecno extended public keys use `kpub` prefix.
+ * Please note that Vecno extended public keys use `vpub` prefix.
  *
  * @see {@link PrivateKeyGenerator}, {@link PublicKeyGenerator}, {@link XPrv}, {@link Mnemonic}
  * @category Wallet SDK
@@ -14156,53 +14156,53 @@ module.exports.__wbindgen_cb_drop = function(arg0) {
     return ret;
 };
 
-module.exports.__wbindgen_closure_wrapper16010 = function(arg0, arg1, arg2) {
-    const ret = makeMutClosure(arg0, arg1, 5855, __wbg_adapter_72);
+module.exports.__wbindgen_closure_wrapper16052 = function(arg0, arg1, arg2) {
+    const ret = makeMutClosure(arg0, arg1, 5844, __wbg_adapter_72);
     return addHeapObject(ret);
 };
 
-module.exports.__wbindgen_closure_wrapper16777 = function(arg0, arg1, arg2) {
-    const ret = makeMutClosure(arg0, arg1, 5881, __wbg_adapter_75);
+module.exports.__wbindgen_closure_wrapper16847 = function(arg0, arg1, arg2) {
+    const ret = makeMutClosure(arg0, arg1, 5893, __wbg_adapter_75);
     return addHeapObject(ret);
 };
 
-module.exports.__wbindgen_closure_wrapper16779 = function(arg0, arg1, arg2) {
-    const ret = makeMutClosure(arg0, arg1, 5881, __wbg_adapter_78);
+module.exports.__wbindgen_closure_wrapper16849 = function(arg0, arg1, arg2) {
+    const ret = makeMutClosure(arg0, arg1, 5893, __wbg_adapter_78);
     return addHeapObject(ret);
 };
 
-module.exports.__wbindgen_closure_wrapper16781 = function(arg0, arg1, arg2) {
-    const ret = makeMutClosure(arg0, arg1, 5881, __wbg_adapter_81);
+module.exports.__wbindgen_closure_wrapper16851 = function(arg0, arg1, arg2) {
+    const ret = makeMutClosure(arg0, arg1, 5893, __wbg_adapter_81);
     return addHeapObject(ret);
 };
 
-module.exports.__wbindgen_closure_wrapper17137 = function(arg0, arg1, arg2) {
-    const ret = makeMutClosure(arg0, arg1, 5992, __wbg_adapter_84);
+module.exports.__wbindgen_closure_wrapper17174 = function(arg0, arg1, arg2) {
+    const ret = makeMutClosure(arg0, arg1, 5989, __wbg_adapter_84);
     return addHeapObject(ret);
 };
 
-module.exports.__wbindgen_closure_wrapper17138 = function(arg0, arg1, arg2) {
-    const ret = makeMutClosure(arg0, arg1, 5992, __wbg_adapter_84);
+module.exports.__wbindgen_closure_wrapper17175 = function(arg0, arg1, arg2) {
+    const ret = makeMutClosure(arg0, arg1, 5989, __wbg_adapter_84);
     return addHeapObject(ret);
 };
 
-module.exports.__wbindgen_closure_wrapper799 = function(arg0, arg1, arg2) {
+module.exports.__wbindgen_closure_wrapper791 = function(arg0, arg1, arg2) {
     const ret = makeMutClosure(arg0, arg1, 170, __wbg_adapter_60);
     return addHeapObject(ret);
 };
 
-module.exports.__wbindgen_closure_wrapper9033 = function(arg0, arg1, arg2) {
-    const ret = makeMutClosure(arg0, arg1, 2571, __wbg_adapter_69);
+module.exports.__wbindgen_closure_wrapper9041 = function(arg0, arg1, arg2) {
+    const ret = makeMutClosure(arg0, arg1, 2600, __wbg_adapter_69);
     return addHeapObject(ret);
 };
 
-module.exports.__wbindgen_closure_wrapper925 = function(arg0, arg1, arg2) {
-    const ret = makeClosure(arg0, arg1, 222, __wbg_adapter_63);
+module.exports.__wbindgen_closure_wrapper915 = function(arg0, arg1, arg2) {
+    const ret = makeClosure(arg0, arg1, 221, __wbg_adapter_63);
     return addHeapObject(ret);
 };
 
-module.exports.__wbindgen_closure_wrapper927 = function(arg0, arg1, arg2) {
-    const ret = makeClosure(arg0, arg1, 222, __wbg_adapter_66);
+module.exports.__wbindgen_closure_wrapper917 = function(arg0, arg1, arg2) {
+    const ret = makeClosure(arg0, arg1, 221, __wbg_adapter_66);
     return addHeapObject(ret);
 };
 
