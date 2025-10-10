@@ -1,5 +1,5 @@
 import Database from '../database';
-import { sompiToVecnoStringWithSuffix, type IPaymentOutput, createTransactions, PrivateKey, UtxoProcessor, UtxoContext, type RpcClient } from "../../wasm/vecno";
+import { veniToVecnoStringWithSuffix, type IPaymentOutput, createTransactions, PrivateKey, UtxoProcessor, UtxoContext, type RpcClient } from "../../wasm/vecno";
 import Monitoring from '../monitoring';
 import { DEBUG } from "../../index";
 
@@ -37,7 +37,7 @@ export default class trxManager {
     let payments: IPaymentOutput[] = [];
     for (const { address, balance } of balances) {
       if (balance > 0) {
-        this.monitoring.log(`TrxManager: Processing balance ${sompiToVecnoStringWithSuffix(balance, this.networkId!)} for address ${address}`);
+        this.monitoring.log(`TrxManager: Processing balance ${veniToVecnoStringWithSuffix(balance, this.networkId!)} for address ${address}`);
         if (DEBUG) this.monitoring.debug(`TrxManager: Adding payment for ${address} with amount ${balance}`);
         payments.push({
           address: address,
