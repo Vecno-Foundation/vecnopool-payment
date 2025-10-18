@@ -59,12 +59,27 @@ export default class trxManager {
     if (transactionId) {
       for (const { address, balance } of balances) {
         if (balance > 0) {
-          if (DEBUG) this.monitoring.debug(`TrxManager: Resetting balance for address ${address}`);
-          await this.db.resetBalanceByAddress(address);
-          this.monitoring.log(`TrxManager: Reset balance for address ${address}`);
+          if (DEBUG) this.monitoring.debug(`TrxManager: Deducting balance ${balance} for address ${address}`);
+          await this.db.resetBalanceByAddress(address, balance);
+          this.monitoring.log(`TrxManager: Deducted balance for address ${address}`);
+          // Fetch and log the updated balance
+          try {
+            const res = await this.db.client.query(
+              'SELECT available_balance FROM balances WHERE address = $1',
+              [address]
+            );
+            if (res.rows.length > 0) {
+              const newBalance = BigInt(res.rows[0].available_balance);
+              this.monitoring.log(`TrxManager: New balance for address ${address}: ${veniToVecnoStringWithSuffix(newBalance, this.networkId!)}`);
+            } else {
+              this.monitoring.error(`TrxManager: No balance found for address ${address} after deduction`);
+            }
+          } catch (error) {
+            this.monitoring.error(`TrxManager: Failed to fetch balance for address ${address}: ${error}`);
+          }
         }
       }
-      if (DEBUG) this.monitoring.debug(`TrxManager: All balances reset for processed payments`);
+      if (DEBUG) this.monitoring.debug(`TrxManager: All balances updated for processed payments`);
     } else {
       if (DEBUG) this.monitoring.debug(`TrxManager: No transaction ID returned, skipping balance reset`);
     }
@@ -73,7 +88,6 @@ export default class trxManager {
   async send(outputs: IPaymentOutput[]) {
     if (DEBUG) this.monitoring.debug(`TrxManager: Initiating send for ${outputs.length} payment outputs`);
     console.log(outputs);
-    if (DEBUG) this.monitoring.debug(`TrxManager: Using UtxoContext: ${this.context.id}`);
     try {
       const { transactions, summary } = await createTransactions({
         entries: this.context,
@@ -90,8 +104,25 @@ export default class trxManager {
         if (DEBUG) this.monitoring.debug(`TrxManager: Submitting transaction ID: ${transaction.id}`);
         await transaction.submit(this.processor.rpc);
         if (DEBUG) this.monitoring.debug(`TrxManager: Transaction ID: ${transaction.id} submitted successfully`);
-        await new Promise(resolve => setTimeout(resolve, 2000)); // 2-second delay
-        if (DEBUG) this.monitoring.debug(`TrxManager: Waited 2 seconds after submitting transaction ID: ${transaction.id}`);
+        await new Promise(resolve => setTimeout(resolve, 3000)); // 3-second delay
+        if (DEBUG) this.monitoring.debug(`TrxManager: Waited 3 seconds after submitting transaction ID: ${transaction.id}`);
+      }
+
+      // Record each payment in the payments table
+      if (!summary.finalTransactionId) {
+        this.monitoring.error(`TrxManager: No finalTransactionId returned, skipping payment recording`);
+        return null;
+      }
+
+      for (const output of outputs) {
+        const addressStr = typeof output.address === 'string' ? output.address : output.address.toString();
+        if (DEBUG) this.monitoring.debug(`TrxManager: Recording payment for address ${addressStr} with amount ${output.amount} and txId ${summary.finalTransactionId}`);
+        try {
+          await this.db.recordPayment(addressStr, output.amount, summary.finalTransactionId);
+          this.monitoring.log(`TrxManager: Recorded payment for address ${addressStr}`);
+        } catch (error) {
+          this.monitoring.error(`TrxManager: Failed to record payment for address ${addressStr}: ${error}`);
+        }
       }
 
       if (DEBUG) this.monitoring.debug(`TrxManager: Send completed, returning finalTransactionId: ${summary.finalTransactionId}`);
@@ -116,10 +147,4 @@ export default class trxManager {
     this.processor.start();
     if (DEBUG) this.monitoring.debug(`TrxManager: UTXO processor started`);
   }
-
-  // stopProcessor() {
-  //   if (DEBUG) this.monitoring.debug(`TrxManager: Stopping UTXO processor`);
-  //   this.processor.stop();
-  //   if (DEBUG) this.monitoring.debug(`TrxManager: UTXO processor stopped`);
-  // }
 }

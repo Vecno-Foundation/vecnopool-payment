@@ -37,47 +37,23 @@ export default class Database {
     }));
   }
 
-  async resetBalanceByAddress(wallet: string) {
-    // Update the pool's balances table
+  async resetBalanceByAddress(wallet: string, amount: bigint) {
+    // Update the pool's balances table by subtracting the sent amount
     await this.client.query(
-      'UPDATE balances SET available_balance = $1 WHERE address = $2',
-      [0n, wallet]
+      'UPDATE balances SET available_balance = GREATEST(0, available_balance - $1) WHERE address = $2',
+      [amount.toString(), wallet]
     );
   }
 
   async recordPayment(address: string, amount: bigint, txId: string) {
     // Insert a new payment record into the payments table
-    const timestamp = Math.floor(Date.now() / 1000); // Current timestamp in seconds
+    const timestamp = Math.floor(Date.now() / 1000);
     await this.client.query(
       `
       INSERT INTO payments (address, amount, tx_id, timestamp, notified)
-      VALUES ($1, $2, $3, $4, $5)
+      VALUES ($1, $2, $3, $4, $5);
       `,
       [address, amount.toString(), txId, timestamp, false]
-    );
-  }
-
-  async getPendingPayments(address: string) {
-    // Query unnotified payments for an address
-    const res = await this.client.query(
-      'SELECT id, address, amount, tx_id, timestamp, notified FROM payments WHERE address = $1 AND notified = $2',
-      [address, false]
-    );
-    return res.rows.map((row: PaymentRow) => ({
-      id: row.id,
-      address: row.address,
-      amount: BigInt(row.amount),
-      txId: row.tx_id,
-      timestamp: Number(row.timestamp),
-      notified: row.notified
-    }));
-  }
-
-  async markPaymentNotified(id: string) {
-    // Update the notified status of a payment
-    await this.client.query(
-      'UPDATE payments SET notified = $1 WHERE id = $2',
-      [true, id]
     );
   }
 
