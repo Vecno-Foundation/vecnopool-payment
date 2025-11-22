@@ -18,7 +18,7 @@ The SDK is currently separated into the following top-level categories:
 
 - **RPC API** — RPC API for the Vecnod using WebSockets.
 - **Wallet SDK** — Bindings for primitives related to key management and transactions.
-- **Wallet API** — API for the Rusty Vecno Wallet framework.
+- **Wallet API** — API for the Vecno Wallet framework.
 
 ## WASM32 SDK release packages
 
@@ -36,14 +36,14 @@ The following is a brief overview of the SDK folder structure (as available in t
 
 - `web/vecnoa` - **full** Vecnod WASM32 SDK bindings for use in web browsers.
 - `web/vecno-rpc` - only the RPC bindings for use in web browsers (reduced WASM binary size).
-- `nodejs/vecno` - **full** Rusty Vecno WASM32 SDK bindings for use with NodeJS.
+- `nodejs/vecno` - **full** Vecno WASM32 SDK bindings for use with NodeJS.
 - `docs` - Vecnod WASM32 SDK documentation.
 - `examples` folders contain examples for NodeJS and web browsers.
 - `examples/data` - folder user by examples for configuration and wallet data storage.
 - `examples/javascript` - JavaScript examples.
 - `examples/javascript/general` - General SDK examples (keys & derivation, addresses, encryption, etc.).
 - `examples/javascript/transactions` - Creating, sending and receiving transactions.
-- `examples/javascript/wallet` - Interfacing with the Rusty Vecno Wallet framework.
+- `examples/javascript/wallet` - Interfacing with the Vecno Wallet framework.
 - `examples/typescript` - TypeScript examples.
 
 If you are using JavaScript and Visual Studio Code, it is highly recommended you replicate
@@ -169,7 +169,7 @@ let {
 const rpc = new RpcClient({
     url: "127.0.0.1", 
     encoding: Encoding.Borsh, 
-    network : "testnet-10"
+    network : "testnet"
 });
 
 (async () => {
